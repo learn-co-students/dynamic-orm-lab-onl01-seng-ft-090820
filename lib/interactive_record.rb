@@ -1,5 +1,6 @@
 require_relative "../config/environment.rb"
 require 'active_support/inflector'
+require 'pry'
 
 class InteractiveRecord
   
@@ -54,13 +55,17 @@ class InteractiveRecord
         DB[:conn].execute(sql,name)
     end
 
-    def self.find_by(attribute)
-        sql = <<-SQL
-        "SELECT * FROM #{self.table_name}
-         WHERE #{self.column_names.split(", ").each do |col|
-            when col == attribute} = ?"
-        SQL
-        
-        DB[:conn].execute(sql, attribute)
+    def self.find_by(col_name)
+        # binding.pry
+        column_name = col_name.keys[0]
+        column_value = col_name.values[0]
+        # sql = <<-SQL
+        # SELECT * 
+        # FROM #{self.table_name}
+        # WHERE column_name = ? , column_value
+        # SQL
+        # binding.pry
+
+        DB[:conn].execute("SELECT * FROM #{self.table_name} WHERE #{column_name} = ?", column_value)
     end 
 end
