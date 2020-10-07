@@ -24,13 +24,13 @@ class InteractiveRecord
             self.send("#{keyword}=", value)
         end 
     end
+    
+    def col_names_for_insert
+        self.class.column_names.delete_if{|col| col == "id"}.join(", ")
+    end 
 
     def table_name_for_insert
         self.class.table_name
-    end 
-
-    def col_names_for_insert
-        self.class.column_names.delete_if{|col| col == "id"}.join(", ")
     end 
 
     def values_for_insert
@@ -39,6 +39,12 @@ class InteractiveRecord
             values << "'#{send(col_name)}'"unless send(col_name).nil? 
         end
         values.join(", ")
+    end
+    
+    def self.find_by(col_name)
+        column_name = col_name.keys[0]
+        column_value = col_name.values[0]
+        DB[:conn].execute("SELECT * FROM #{self.table_name} WHERE #{column_name} = ?", column_value)
     end 
 
     def save 
@@ -52,11 +58,7 @@ class InteractiveRecord
         DB[:conn].execute(sql,name)
     end
 
-    def self.find_by(col_name)
-        column_name = col_name.keys[0]
-        column_value = col_name.values[0]
-        DB[:conn].execute("SELECT * FROM #{self.table_name} WHERE #{column_name} = ?", column_value)
-    end 
+    
 
   
 end
